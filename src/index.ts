@@ -1,6 +1,6 @@
 import * as ALI from 'aliyun-sdk';
 import * as os from 'os'
-import { env } from 'process'
+import { env, on } from 'process'
 let hostname = env.HOSTNAME || os.hostname();
 let logCache = [];
 let sls = {
@@ -10,6 +10,8 @@ export default function slsdefault(conf) {
     return new AliSLS(conf);
 }
 export class AliSLS {
+    config: any = {}
+    sls: any;
     constructor(config: any) {
         if (
             !config.accessKeyId
@@ -39,29 +41,37 @@ export class AliSLS {
                 timeout: 1000  //1sec, 默认没有timeout
             }
         });
+        this.config = config;
+        this.sls = sls;
         if (config.hostname) {
             hostname = config.hostname;
         }
+        on('beforeExit', () => {
+            this.write()
+        })
         setInterval(() => {
-            if (logCache.length > 0) {
-                sls.putLogs({
-                    projectName: config.projectName,
-                    logStoreName: config.logStoreName,
-                    logGroup: {
-                        logs: logCache,
-                        topic: config.topic || 'apilog',
-                        // server: hostname,
-                        source: hostname
-                    }
-                }, (err, data) => {
-                    if (err) {
-                        console.error(err);
-                    }
-                    // console.log(data, err);
-                })
-                logCache = [];
-            }
+            this.write()
         }, config.interval || 3000);
+    }
+    write() {
+        if (logCache.length > 0) {
+            this.sls.putLogs({
+                projectName: this.config.projectName,
+                logStoreName: this.config.logStoreName,
+                logGroup: {
+                    logs: logCache,
+                    topic: this.config.topic || 'apilog',
+                    // server: hostname,
+                    source: hostname
+                }
+            }, (err, data) => {
+                if (err) {
+                    console.error(err);
+                }
+                // console.log(data, err);
+            })
+            logCache = [];
+        }
     }
     put(data: any) {
         let d = {
