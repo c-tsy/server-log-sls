@@ -55,6 +55,7 @@ export class AliSLS {
     }
     write() {
         if (logCache.length > 0) {
+            let lc = [...logCache]
             this.sls.putLogs({
                 projectName: this.config.projectName,
                 logStoreName: this.config.logStoreName,
@@ -67,6 +68,7 @@ export class AliSLS {
             }, (err, data) => {
                 if (err) {
                     console.error(err);
+                    console.log(JSON.stringify(lc));
                 }
                 // console.log(data, err);
             })
@@ -78,7 +80,7 @@ export class AliSLS {
             contents: Object.keys(data).map((v: string) => {
                 return {
                     key: v,
-                    value: 'object' == typeof data[v] ? JSON.stringify(data[v]) : ('number' == typeof data[v] ? data[v].toString() : (undefined === data[v] ? '' : data[v]))
+                    value: 'object' == typeof data[v] ? JSON.stringify(data[v]) : (['number', 'boolean'].includes(typeof data[v]) ? data[v].toString() : (undefined === data[v] ? '' : data[v]))
                 }
             }),
             time: Math.floor(data.etime / 1000),
