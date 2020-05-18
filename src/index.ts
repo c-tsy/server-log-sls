@@ -80,7 +80,7 @@ export class AliSLS {
             contents: Object.keys(data).map((v: string) => {
                 return {
                     key: v,
-                    value: 'object' == typeof data[v] ? JSON.stringify(data[v]) : (['number', 'boolean'].includes(typeof data[v]) ? data[v].toString() : (undefined === data[v] ? '' : data[v]))
+                    value: 'object' == typeof data[v] ? JSON.stringify(data[v]) : (['number', 'boolean'].includes(typeof data[v]) ? data[v].toString() : (undefined === data[v] ? '' : data[v].toString()))
                 }
             }),
             time: Math.floor(data.etime / 1000),
