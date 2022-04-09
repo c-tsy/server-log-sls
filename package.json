@@ -17,7 +17,7 @@
   "dependencies": {
     "@ctsy/server-log": "^1.0.5",
     "aliyun-sdk": "^1.12.3",
-    "moment": "^2.26.0"
+    "moment": "^2.29.2"
   },
   "devDependencies": {
     "@types/moment": "^2.13.0"
